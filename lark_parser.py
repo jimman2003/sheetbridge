@@ -4,10 +4,9 @@ import xml.etree.ElementTree as ET
 from lark import Lark,Transformer
 
 
-with open('grammar.lark') as f:
-    grammar = f.read()
 
-l = Lark(grammar)
+
+l = Lark.open('grammar.lark')
 
 class PythonTransformer(Transformer):
       def range(self,r):
