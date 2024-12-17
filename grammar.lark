@@ -1,0 +1,15 @@
+
+start : "SUM" args  -> sum
+      | "AVERAGE" args -> average
+      | OTHER
+
+?args : "(" (range | CELL) ")"
+
+CELL: (LETTER+ NUMBER+)
+
+range: CELL ":" CELL
+
+
+%import common.LETTER
+%import common.NUMBER
+%ignore OTHER
