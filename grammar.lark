@@ -1,14 +1,17 @@
-
-start : "SUM" args  -> sum
-      | "AVERAGE" args -> average
-      
-
-?args : "(" (range | CELL) ")"
-
-CELL: (LETTER+ NUMBER+)
-
-range: CELL ":" CELL
-
-
 %import common.LETTER
-%import common.NUMBER
+%import common.INT
+
+?start: function
+
+function: (SUFFIX_FUNCTION | PREFIX_FUNCTION | function) args 
+       
+SUFFIX_FUNCTION: "SUM" | "AVERAGE" | "COUNT" | "MAX" | "MIN" |"MEDIAN"
+PREFIX_FUNCTION: "TEST"
+
+?args: "(" (range | CELL_REF) ("," (range | CELL_REF))* ")"
+
+CELL_REF: ["$"] COLUMN ["$"] INT+
+
+COLUMN : LETTER | /[A-H]/ LETTER | "I" LETTER  
+
+range: CELL_REF ":" CELL_REF
