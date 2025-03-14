@@ -1,9 +1,15 @@
 from zipfile import ZipFile
 import xml.etree.ElementTree as ET
 
-from lark import Lark,Transformer,Token
-
-
+from lark import Lark,Transformer
+import shutil
+import openpyxl
+import openpyxl.cell
+import openpyxl.formula
+import openpyxl.workbook
+import openpyxl.worksheet
+import openpyxl.worksheet.cell_range
+import openpyxl.worksheet.formula
 
 
 l = Lark.open('grammar.lark')
@@ -28,22 +34,23 @@ class PythonTransformer(Transformer):
           case 'PREFIX_FUNCTION':
             return f'{python_name}({args})'
          
-      
+def transform_formula(formula):
+  tree = l.parse(formula)
+  python_formula = PythonTransformer().transform(tree)
+  return python_formula      
     
 
-with ZipFile('../test.xlsx') as myzip:
-    with myzip.open('xl/worksheets/sheet1.xml') as myfile:
-        content = myfile.read().decode('utf-8')
-root=ET.fromstring(content)
+original_file = '../test.xlsx'
+original_excel = openpyxl.load_workbook(original_file)
+sheet = original_excel.active
+for value in sheet.iter_rows():
+  for cell in value:
+    if cell.data_type == 'f':
+      formula = cell.value
+      if not isinstance(formula, openpyxl.worksheet.formula.ArrayFormula):
+        python_formula = transform_formula(formula)
+        #cell.value = "_xlfn._xlws.PY(1,1,C4,C4)"
+        sheet[cell.coordinate] =  openpyxl.worksheet.formula.ArrayFormula(cell.coordinate,python_formula)
+        print(python_formula)
+# original_excel.save('python.xlsx')
 
-def get_formulas():
-    ns={'ns':'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
-    for tag in root.iterfind(".//ns:c/ns:f",ns):
-      if "_xlfn._xlws.PY" not in tag.text:
-          yield tag.text
-
-for formula in get_formulas():
-    print(formula)
-    tree =l.parse(formula)
-    print(tree)
-    print(PythonTransformer().transform(tree))

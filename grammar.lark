@@ -1,10 +1,10 @@
 %import common.LETTER
 %import common.INT
 
-?start: function
+?start:  function
 
-function: (SUFFIX_FUNCTION | PREFIX_FUNCTION | function) args 
-       
+function: "=" (SUFFIX_FUNCTION | PREFIX_FUNCTION | function) args 
+
 SUFFIX_FUNCTION: "SUM" | "AVERAGE" | "COUNT" | "MAX" | "MIN" |"MEDIAN"
 PREFIX_FUNCTION: "TEST"
 
