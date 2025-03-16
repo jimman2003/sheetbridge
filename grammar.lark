@@ -1,17 +1,26 @@
 %import common.LETTER
 %import common.INT
+%import common.WS
 
-?start:  function
+?start:  formula
 
-function: "=" (SUFFIX_FUNCTION | PREFIX_FUNCTION | function) args 
+?formula: "=" expression 
 
+?expression:  WS* nospace_expression WS*
+
+?nospace_expression: "(" expression ")" | function | expression INFIX_OPERATOR expression -> calc | CELL_REF
+
+
+INFIX_OPERATOR: "+" | "-" | "*" | "/"
+
+?function: (SUFFIX_FUNCTION | PREFIX_FUNCTION) args 
 SUFFIX_FUNCTION: "SUM" | "AVERAGE" | "COUNT" | "MAX" | "MIN" |"MEDIAN"
 PREFIX_FUNCTION: "TEST"
 
-?args: "(" (range | CELL_REF) ("," (range | CELL_REF))* ")"
+?args: "(" (RANGE | CELL_REF) ("," (RANGE | CELL_REF))* ")"
 
 CELL_REF: ["$"] COLUMN ["$"] INT+
 
 COLUMN : LETTER | /[A-H]/ LETTER | "I" LETTER  
 
-range: CELL_REF ":" CELL_REF
+RANGE: CELL_REF ":" CELL_REF
