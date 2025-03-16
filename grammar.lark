@@ -1,5 +1,6 @@
 %import common.LETTER
 %import common.INT
+%import common.NUMBER
 %import common.WS
 
 ?start:  formula
@@ -8,7 +9,7 @@
 
 ?expression:  WS* nospace_expression WS*
 
-?nospace_expression: "(" expression ")" | function | expression INFIX_OPERATOR expression -> calc | CELL_REF
+?nospace_expression: "(" expression ")" | function | expression INFIX_OPERATOR expression -> calc | CELL_REF | NUMBER
 
 
 INFIX_OPERATOR: "+" | "-" | "*" | "/"
@@ -19,8 +20,9 @@ PREFIX_FUNCTION: "TEST"
 
 ?args: "(" (RANGE | CELL_REF) ("," (RANGE | CELL_REF))* ")"
 
+RANGE: CELL_REF ":" CELL_REF
 CELL_REF: ["$"] COLUMN ["$"] INT+
 
 COLUMN : LETTER | /[A-H]/ LETTER | "I" LETTER  
 
-RANGE: CELL_REF ":" CELL_REF
+

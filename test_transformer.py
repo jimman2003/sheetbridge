@@ -21,6 +21,7 @@ def test_suffix_functions(formula: str, python_formula: str):
     [
         ("=A1*A2", 'xl("A1")*xl("A2")'),
         ("=A1+A2+A3", 'xl("A1")+xl("A2")+xl("A3")'),
+        ("=2*A1", '2*xl("A1")'),
     ]
 )
 def test_infix_operators(formula: str, python_formula: str):
