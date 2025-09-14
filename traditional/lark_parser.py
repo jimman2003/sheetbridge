@@ -6,7 +6,7 @@ l = Lark.open("grammar.lark", start="formula")
 class PythonTransformer(Transformer):
     def function(self, s):
         [excel_function, args] = s
-        changed_names = {"AVERAGE": "mean","UNIQUE":"pd.unique"}
+        changed_names = {"AVERAGE": "mean", "UNIQUE": "pd.unique"}
         python_name = changed_names.get(excel_function, excel_function.lower())
         match excel_function.type:
             case "SUFFIX_FUNCTION":
@@ -38,8 +38,8 @@ class PandasTransformer(PythonTransformer):
         [start, end] = r.split(":")
         col, row = cell_to_ints(start)
         col2, row2 = cell_to_ints(end)
-        row_expr=f"{row}:{row2}" if row!=row2 else f"{row}"
-        col_expr=f"{col}:{col2}" if col!=col2 else f"{col}"
+        row_expr = f"{row}:{row2}" if row != row2 else f"{row}"
+        col_expr = f"{col}:{col2}" if col != col2 else f"{col}"
         return f"df.iloc[{row_expr},{col_expr}]"
 
     def CELL_REF(self, r):

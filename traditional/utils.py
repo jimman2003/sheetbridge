@@ -9,7 +9,8 @@ def transform_excel_sheet(sheet, transformer):
                 formula = cell.value
                 if not isinstance(formula, openpyxl.worksheet.formula.ArrayFormula):
                     yield transform_formula(formula, transformer)
- 
+
+
 def transform_excel(file, transformer):
     original_excel = openpyxl.load_workbook(file)
     sheet = original_excel.active

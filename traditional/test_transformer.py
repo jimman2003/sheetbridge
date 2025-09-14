@@ -29,10 +29,12 @@ def test_suffix_functions(formula: str, expected: str, transformer):
 def test_infix_operators(formula: str, expected: str, transformer):
     assert transform_formula(formula, transformer) == expected
 
+
 @pytest.mark.parametrize(
     "formula,expected,transformer",
     [
         ("=UNIQUE(A1:A10)", "pd.unique(df.iloc[0:9,0])", PandasTransformer),
-    ])
+    ],
+)
 def test_prefix_functions(formula: str, expected: str, transformer):
     assert transform_formula(formula, transformer) == expected
