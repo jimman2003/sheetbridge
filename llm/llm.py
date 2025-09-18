@@ -1,3 +1,4 @@
+import os
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
@@ -21,7 +22,8 @@ class FormulaResponse(BaseModel):
 gemini_client = genai.Client()
 openrouter_client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=OPEN_ROUTER_API_KEY)
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
 
 def generate_formula_gemini(system_prompt: str, user_prompt: str):
     response = gemini_client.models.generate_content(
@@ -50,15 +52,12 @@ def generate_formula_ollama(system_prompt: str, user_prompt: str):
 
 
 def generate_formula_openrouter(system_prompt: str, user_prompt: str):
-    response = openrouter_client.models.generate_content(
-        model="gpt-4o",
+    response = openrouter_client.chat.completions.create(
+        model="deepseek/deepseek-chat-v3.1:free",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": FormulaResponse,
-        },
+        response_format={"type":"json_schema", "json_schema": FormulaResponse.model_json_schema()},
     )
     return response
