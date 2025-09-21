@@ -5,8 +5,10 @@ from google.genai import types
 import dotenv
 import ollama
 from openai import OpenAI
+from traditional.utils import time_function
 
 dotenv.load_dotenv()
+
 system_prompt_formula = """
 You are an expert in creating Python code from spreadsheet formulas. 
 Given the Excel formula, generate the appropriate Python code and provide a brief explanation of how it works.
@@ -25,6 +27,7 @@ openrouter_client = OpenAI(
     api_key=os.getenv("OPENROUTER_API_KEY"),
 )
 
+@time_function("Gemini API")
 def generate_formula_gemini(system_prompt: str, user_prompt: str):
     response = gemini_client.models.generate_content(
         model="gemini-2.5-flash",
@@ -35,9 +38,10 @@ def generate_formula_gemini(system_prompt: str, user_prompt: str):
             response_schema=FormulaResponse,
         ),
     )
-    return response
+    return response.parsed
 
 
+@time_function("Ollama API")
 def generate_formula_ollama(system_prompt: str, user_prompt: str):
     response = ollama.chat(
         model="qwen2.5-7b-instruct",
@@ -51,6 +55,7 @@ def generate_formula_ollama(system_prompt: str, user_prompt: str):
     return FormulaResponse.model_validate_json(response.message.content)
 
 
+@time_function("OpenRouter API")
 def generate_formula_openrouter(system_prompt: str, user_prompt: str):
     response = openrouter_client.chat.completions.create(
         model="deepseek/deepseek-chat-v3.1:free",
@@ -58,6 +63,6 @@ def generate_formula_openrouter(system_prompt: str, user_prompt: str):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        response_format={"type":"json_schema", "json_schema": FormulaResponse.model_json_schema()},
+        # response_format={"type":"json_schema", "json_schema": FormulaResponse.model_json_schema()},
     )
-    return response
+    return response.choices[0].message.content
