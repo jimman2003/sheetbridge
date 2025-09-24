@@ -10,8 +10,17 @@ from traditional.utils import time_function
 dotenv.load_dotenv()
 
 system_prompt_formula = """
-You are an expert in creating Python code from spreadsheet formulas. 
-Given the Excel formula, generate the appropriate Python code and provide a brief explanation of how it works.
+Act as an expert at converting Excel formulas to Python Pandas code. Input will be SpreadsheetML XML exported from an Excel worksheet. Automatically parse the XML, extract each cell’s formula from <f> elements (including shared or array formulas if present), and produce equivalent, runnable Python code that uses Pandas for each formula. For each item:
+•	Generate Python code that mirrors the Excel logic, including operators, function semantics, ranges, and absolute/relative references.
+•	If ranges are used (e.g., A1:A10), translate them into Python data access patterns and aggregate operations.
+•	Note any Excel functions without direct Python equivalents and propose idiomatic alternatives.
+•	Provide a brief explanation of how the Python code implements the formula.
+Assumptions:
+•	SpreadsheetML stores formulas in the CellFormula element <f> for cells with formulas.
+•	The workbook structure follows the Open XML SpreadsheetML specification.
+•	If a formula is shared, resolve the base formula and adjust cell-relative references for each dependent cell.
+Return a structured list of results for all formulas found.
+
 """
 
 
@@ -35,7 +44,7 @@ def generate_formula_gemini(system_prompt: str, user_prompt: str):
         config=types.GenerateContentConfig(
             system_instruction=system_prompt,
             response_mime_type="application/json",
-            response_schema=FormulaResponse,
+            response_schema=list[FormulaResponse],
         ),
     )
     return response.parsed
@@ -44,7 +53,7 @@ def generate_formula_gemini(system_prompt: str, user_prompt: str):
 @time_function("Ollama API")
 def generate_formula_ollama(system_prompt: str, user_prompt: str):
     response = ollama.chat(
-        model="qwen2.5-7b-instruct",
+        model="qwen3:8b",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
