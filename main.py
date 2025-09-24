@@ -25,7 +25,7 @@ def llm_ui(excel_file):
         "Select a provider", options=["Local", "Gemini", "OpenRouter"], index=None
     )
     with ZipFile(excel_file) as zf:
-        with zf.open(zf.namelist()[0]) as file:
+        with zf.open("xl/worksheets/sheet1.xml") as file:
             excel_content = file.read().decode("utf-8")
     new_script = None
     with st.spinner("Generating Python code using LLM..."):

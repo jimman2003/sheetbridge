@@ -11,7 +11,6 @@
 
 ?nospace_expression: "(" expression ")" | function | expression INFIX_OPERATOR expression -> calc | CELL_REF | NUMBER
 
-
 INFIX_OPERATOR: "+" | "-" | "*" | "/"
 
 ?function: (SUFFIX_FUNCTION | PREFIX_FUNCTION) args 
@@ -23,6 +22,4 @@ PREFIX_FUNCTION: "UNIQUE"
 RANGE: CELL_REF ":" CELL_REF
 CELL_REF: ["$"] COLUMN ["$"] INT+
 
-COLUMN : LETTER | /[A-H]/ LETTER | "I" LETTER  
-
-
+COLUMN : LETTER | /[A-H]/ LETTER | "I" LETTER
